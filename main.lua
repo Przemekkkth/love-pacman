@@ -2,6 +2,7 @@ Object = require 'libraries/classic'
 sti = require 'libraries/sti'
 anim8 = require 'libraries/anim8'
 Input = require 'libraries/boipushy/Input'
+wf = require 'libraries/windfield'
 --Input = require 'libraries/boipushy/Input'
 require 'utils/Settings'
 require 'utils/Utils'
@@ -10,6 +11,8 @@ require 'utils/Utils'
 THINGS_IMG = love.graphics.newImage('assets/sprite/things.png')
 function love.load()
     input = Input()
+    world = wf.newWorld(0, 0)
+
     input:bind('left', 'left_arrow')
     input:bind('right', 'right_arrow')
     input:bind('up', 'up_arrow')
@@ -29,11 +32,13 @@ end
 
 function love.update(dt)
     pacman:update(dt)
+    world:update(dt)
 end
 
 function love.draw()
     labyrinth:draw()
     pacman:draw()
+    world:draw()
 end
 
 -- Room --
