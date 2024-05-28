@@ -2,22 +2,21 @@ Object = require 'libraries/classic'
 sti = require 'libraries/sti'
 anim8 = require 'libraries/anim8'
 Input = require 'libraries/boipushy/Input'
-wf = require 'libraries/windfield'
---Input = require 'libraries/boipushy/Input'
 require 'utils/Settings'
 require 'utils/Utils'
 
 
 THINGS_IMG = love.graphics.newImage('assets/sprite/things.png')
+THINGS_IMG_SIZE = 30
 function love.load()
     input = Input()
-    world = wf.newWorld(0, 0)
 
     input:bind('left', 'left_arrow')
     input:bind('right', 'right_arrow')
     input:bind('up', 'up_arrow')
     input:bind('down', 'down_arrow')
     input:bind('mouse1', 'leftButton')
+    input:bind('p', 'p')
 
     love.window.setTitle(Settings.title)
     love.window.setMode(Settings.screenWidth, Settings.screenHeight)
@@ -28,17 +27,18 @@ function love.load()
 
     labyrinth = Labyrinth()
     pacman = Pacman()
+    entity = Entity(1, 1)
 end
 
 function love.update(dt)
     pacman:update(dt)
-    world:update(dt)
+    entity:update(dt)
 end
 
 function love.draw()
     labyrinth:draw()
     pacman:draw()
-    world:draw()
+    entity:draw()
 end
 
 -- Room --
