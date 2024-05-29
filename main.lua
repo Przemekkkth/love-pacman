@@ -37,7 +37,7 @@ end
 
 function love.draw()
     labyrinth:draw()
-    pacman:draw()
+    --pacman:draw()
     entity:draw()
 end
 

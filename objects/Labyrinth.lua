@@ -55,7 +55,7 @@ function Labyrinth:new()
         {x = 7,  y = 6, movements = {'left', 'right', 'up', 'down'} },
         {x = 10, y = 6, movements = {'left', 'right', 'down'} },
         {x = 13, y = 6, movements = {'left', 'right', 'up'} },
-        {x = 16, y = 6, movements = {'left', 'right', 'down'} },
+        {x = 16, y = 6, movements = {'left', 'right', 'up'} },
         {x = 19, y = 6, movements = {'left', 'right', 'down'} },
         {x = 22, y = 6, movements = {'left', 'right', 'up', 'down'} },
         {x = 27, y = 6, movements = {'left', 'up', 'down'} },
@@ -120,7 +120,8 @@ function Labyrinth:new()
     }
     
     self.OFFSET_X = 0
-    self.OFFSET_Y = 3 * 16
+    self.OFFSET_Y = 3 * self.m_tileSize
+    self.m_debugMode = false
 end
 
 function Labyrinth:update(dt)
@@ -129,16 +130,19 @@ end
 
 function Labyrinth:draw()
     self.m_gameMap:draw()
-    love.graphics.setColor(0,1,0)
-    for x = 1, Settings.screenWidth / 16 do
-        love.graphics.line( x * 16, 0, x * 16, Settings.screenHeight)
-    end
+    self:drawCoins()
 
-    for y = 1, Settings.screenHeight / 16 do
-        love.graphics.line( 0, y * 16, Settings.screenWidth, y * 16)
-    end
+    if self.m_debugMode then
+        love.graphics.setColor(0,1,0)
+        for x = 1, Settings.screenWidth / self.m_tileSize do
+            love.graphics.line( x * self.m_tileSize, 0, x * self.m_tileSize, Settings.screenHeight)
+        end
 
-    love.graphics.setColor(1,1,1)
+        for y = 1, Settings.screenHeight / self.m_tileSize do
+            love.graphics.line( 0, y * self.m_tileSize, Settings.screenWidth, y * self.m_tileSize)
+        end
+        love.graphics.setColor(1,1,1)
+    end
 end
 
 function Labyrinth:isBlockedElement(row, col)
@@ -175,3 +179,29 @@ function Labyrinth:checkMovePoint(objX, objY, direction)
     end
     return false
 end
+
+function Labyrinth:isCollidedWithCoin(row, col, removeDot)
+    if row >= 1 and row <= #self.m_mapCollider and col >= 1 and col <= #self.m_mapCollider[row][1] then
+        local line = self.m_mapCollider[row][1]
+        if not removeDot and line:sub(col, col) == '.' then
+            return true
+        end
+        
+        if line:sub(col, col) == '.' then
+            self.m_mapCollider[row][1] = line:sub(1, col - 1) .. ' ' .. line:sub(col + 1)
+            return true
+        end
+    end
+
+    return false
+end
+
+function Labyrinth:drawCoins() 
+    for y = 1, #self.m_mapCollider do
+        for x = 1, #self.m_mapCollider[y][1] do 
+            if self:isCollidedWithCoin(y, x, false) then
+                love.graphics.draw(self.m_spritesheet, self.m_tileSprites[23], (x - 1)* self.m_tileSize, (y - 1)* self.m_tileSize + self.OFFSET_Y)
+            end
+        end
+    end
+end 
