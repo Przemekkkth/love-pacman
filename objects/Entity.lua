@@ -10,6 +10,16 @@ function Entity:new(tileX, tileY)
     self.m_speed = 1
     self.m_pickUpSFX = love.audio.newSource('assets/sfx/pacman_chomp.wav', 'static')
     self.m_pickUpSFX:setVolume(0.5)
+    self.m_grid = anim8.newGrid( THINGS_IMG_SIZE, THINGS_IMG_SIZE, THINGS_IMG:getWidth(), THINGS_IMG:getHeight() )
+
+    self.animations = {}
+    self.animations.down = anim8.newAnimation( self.m_grid('4-6', 1), 0.2 )
+    self.animations.left = anim8.newAnimation( self.m_grid('7-9', 1), 0.2 )
+    self.animations.right = anim8.newAnimation( self.m_grid('10-12', 1), 0.2 )
+    self.animations.up = anim8.newAnimation( self.m_grid('1-3', 1), 0.2 )
+
+    self.m_anim = self.animations.down
+    self.offset = 7 -- 30px - pacman size 16px - tile size (30px-16px)/2
 end
 
 function Entity:update(dt)
@@ -122,9 +132,15 @@ function Entity:update(dt)
 
     if labyrinth:isCollidedWithCoin(tempY, tempX, true) then
         self.m_pickUpSFX:play()
+    elseif labyrinth:isCollidedWithEnergizer(tempY, tempX, true) then
+        self.m_pickUpSFX:play()
     end
-end
 
+
+
+
+    self:updateAnim(dt)
+end
 
 function Entity:posX() 
     return self.m_screenPosX
@@ -163,7 +179,7 @@ function Entity:teleport(x, y)
 end
 
 function Entity:draw()
-    love.graphics.rectangle('fill', self.m_screenPosX, self.m_screenPosY, 16, 16)
+    self.m_anim:draw(THINGS_IMG, self.m_screenPosX - self.offset, self.m_screenPosY - self.offset)
 end
 
 function Entity:round(num)
@@ -172,4 +188,20 @@ function Entity:round(num)
     else
         return math.ceil(num - 0.5)
     end
+end
+
+function Entity:updateAnim(dt)
+    if self.m_direction == "none" then
+        self.m_anim:gotoFrame(1)
+    elseif self.m_direction == "left" then
+        self.m_anim = self.animations.left
+    elseif self.m_direction == "right" then
+        self.m_anim = self.animations.right
+    elseif self.m_direction == "up" then
+        self.m_anim = self.animations.up
+    elseif self.m_direction == "down" then
+        self.m_anim = self.animations.down
+    end
+
+    self.m_anim:update(dt)
 end

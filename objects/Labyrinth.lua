@@ -13,27 +13,27 @@ function Labyrinth:new()
         {'############################'},
 		{'#............##............#'},
 		{'#.####.#####.##.#####.####.#'},
-		{'#.#  #.#   #.##.#   #.#  #.#'},
+		{'#o#  #.#   #.##.#   #.#  #o#'},
         {'#.####.#####.##.#####.####.#'},
         {'#..........................#'},
         {'#.####.##.########.##.####.#'},
         {'#.####.##.###  ###.##.####.#'},
         {'#......##....##....##......#'},
         {'######.#####.##.#####.######'},
-        {'     #.#####.##.#####.#    #'},
-        {'     #.##..........##.#    #'},
-        {'     #.##.########.##.#    #'},
-        {'######.##.#      #.##.######'},
-        {'..........#      #..........'},
-        {'######.##.#      #.##.######'},
-        {'#    #.##.########.##.#    #'},
-        {'#    #.##..........##.#    #'},
+        {'     #.##### ## #####.#    #'},
+        {'     #.##          ##.#    #'},
+        {'     #.## ######## ##.#    #'},
+        {'######.## #      # ##.######'},
+        {'      .   #      #   .      '},
+        {'######.## #      # ##.######'},
+        {'#    #.## ######## ##.#    #'},
+        {'#    #.##          ##.#    #'},
         {'#    #.##.########.##.#    #'},
         {'######.##.###  ###.##.######'},
         {'#............##............#'},
         {'#.####.#####.##.#####.####.#'},
         {'#.####.#####.##.#####.####.#'},
-        {'#...##................##...#'},
+        {'#o..##................##..o#'},
         {'###.##.##.########.##.##.###'},
         {'###.##.##.###  ###.##.##.###'},
         {'#......##....##....##......#'},
@@ -131,6 +131,7 @@ end
 function Labyrinth:draw()
     self.m_gameMap:draw()
     self:drawCoins()
+    self:drawEnergizer()
 
     if self.m_debugMode then
         love.graphics.setColor(0,1,0)
@@ -196,6 +197,22 @@ function Labyrinth:isCollidedWithCoin(row, col, removeDot)
     return false
 end
 
+function Labyrinth:isCollidedWithEnergizer(row, col, removeEnergizer)
+    if row >= 1 and row <= #self.m_mapCollider and col >= 1 and col <= #self.m_mapCollider[row][1] then
+        local line = self.m_mapCollider[row][1]
+        if not removeEnergizer and line:sub(col, col) == 'o' then
+            return true
+        end
+        
+        if line:sub(col, col) == 'o' then
+            self.m_mapCollider[row][1] = line:sub(1, col - 1) .. ' ' .. line:sub(col + 1)
+            return true
+        end
+    end
+
+    return false
+end
+
 function Labyrinth:drawCoins() 
     for y = 1, #self.m_mapCollider do
         for x = 1, #self.m_mapCollider[y][1] do 
@@ -205,3 +222,13 @@ function Labyrinth:drawCoins()
         end
     end
 end 
+
+function Labyrinth:drawEnergizer()
+    for y = 1, #self.m_mapCollider do
+        for x = 1, #self.m_mapCollider[y][1] do 
+            if self:isCollidedWithEnergizer(y, x, false) then
+                love.graphics.draw(self.m_spritesheet, self.m_tileSprites[31], (x - 1)* self.m_tileSize, (y - 1)* self.m_tileSize + self.OFFSET_Y)
+            end
+        end
+    end
+end
