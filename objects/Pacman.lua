@@ -7,6 +7,7 @@ function Pacman:new()
     self.m_size = 30
     self.m_direction = "none"
     
+    
     -- m_screenPosX = tilePosX * Resources::LABYRINTH_TILE_SIZE + 8.0f + 8.0f - Resources::THINGS_TILE_SIZE/2;
     -- m_screenPosY = tilePosY * Resources::LABYRINTH_TILE_SIZE + 8.0f - Resources::THINGS_TILE_SIZE/2;
     self.m_grid = anim8.newGrid( self.m_size, self.m_size, THINGS_IMG:getWidth(), THINGS_IMG:getHeight() )
@@ -79,6 +80,5 @@ function Pacman:convertTilesToScreenPos()
 end
 
 function Pacman:convertScreenPosToTiles()
-    --return {labyrinth.OFFSET_X + self.m_posX + self.m_size / 4, labyrinth.OFFSET_Y + self.m_posY + self.m_size / 4}
     return {math.floor(self.m_posX + 1), math.floor(self.m_posY + 1) }
 end
