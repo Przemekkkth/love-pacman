@@ -149,6 +149,13 @@ end
 function Labyrinth:isBlockedElement(row, col)
     row = math.floor(row)
     col = math.floor(col)
+    --telepor areas
+    if row == 15 and col == 0 then
+        return false
+    elseif row == 15 and col == 29 then
+        return false
+    end
+
     if row < 1 or row > #self.m_mapCollider then
         return true 
     end

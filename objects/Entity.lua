@@ -7,7 +7,7 @@ function Entity:new(tileX, tileY)
     self.m_screenPosY  = self.m_tileY * 16
     self.m_direction = "none"
     self.m_nextMove = nil
-    self.m_speed = 1
+    self.m_speed = 2
     self.m_pickUpSFX = love.audio.newSource('assets/sfx/pacman_chomp.wav', 'static')
     self.m_pickUpSFX:setVolume(0.5)
     self.m_grid = anim8.newGrid( THINGS_IMG_SIZE, THINGS_IMG_SIZE, THINGS_IMG:getWidth(), THINGS_IMG:getHeight() )
@@ -135,10 +135,8 @@ function Entity:update(dt)
     elseif labyrinth:isCollidedWithEnergizer(tempY, tempX, true) then
         self.m_pickUpSFX:play()
     end
-
-
-
-
+    
+    self:chectTeleport()
     self:updateAnim(dt)
 end
 
@@ -158,6 +156,13 @@ function Entity:getTileY()
     return self.m_tileY
 end
 
+function Entity:setTile(x, y)
+    self.m_tileX = x
+    self.m_tileY = y + 3
+    self.m_screenPosX  = self.m_tileX * 16
+    self.m_screenPosY  = self.m_tileY * 16
+end
+
 function Entity:move(x, y)
     self.m_screenPosX = self.m_screenPosX + x
     self.m_screenPosY = self.m_screenPosY + y
@@ -174,8 +179,17 @@ function Entity:calculateTiles()
     end
 end
 
-function Entity:teleport(x, y)
+function Entity:chectTeleport()
+    --convert to Lua coord (0, 0) => (1, 1)
+    self:calculateTiles()
+    local tempX = self.m_tileX + 1
+    local tempY = self.m_tileY - 2
 
+    if tempY == 15 and tempX == 0 then
+        self:setTile(26, 14)
+    elseif tempY == 15 and tempX == 28 then
+        self:setTile(1, 14)
+    end
 end
 
 function Entity:draw()
