@@ -110,7 +110,7 @@ function Labyrinth:new()
         {x = 16, y = 27, movements = {'right', 'down'} },
         {x = 19, y = 27, movements = {'right', 'up'} },
         {x = 22, y = 27, movements = {'right', 'up'} },
-        {x = 27, y = 27, movements = {'left', 'right', 'up'} },
+        {x = 25, y = 27, movements = {'left', 'right', 'up'} },
         {x = 27, y = 27, movements = {'left', 'down'} },
 
         {x = 2, y = 30, movements = {'right', 'down'} },
@@ -183,6 +183,19 @@ function Labyrinth:checkMovePoint(objX, objY, direction)
                     return true
                 end
             end
+        end
+    end
+    return false
+end
+
+function Labyrinth:isMovePoint(objX, objY)
+    for _, point in ipairs(self.m_movePoints) do
+        -- Access the x and y coordinates
+        local x = point.x
+        local y = point.y
+        
+        if objX == x and objY == y then
+            return true
         end
     end
     return false

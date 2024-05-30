@@ -2,6 +2,7 @@ Object = require 'libraries/classic'
 sti = require 'libraries/sti'
 anim8 = require 'libraries/anim8'
 Input = require 'libraries/boipushy/Input'
+Timer = require 'libraries/hump/timer'
 require 'utils/Settings'
 require 'utils/Utils'
 
@@ -10,6 +11,7 @@ THINGS_IMG = love.graphics.newImage('assets/sprite/things.png')
 THINGS_IMG_SIZE = 30
 function love.load()
     input = Input()
+    timer = Timer()
 
     input:bind('left', 'left_arrow')
     input:bind('right', 'right_arrow')
@@ -28,17 +30,20 @@ function love.load()
     labyrinth = Labyrinth()
     pacman = Pacman()
     entity = Entity(1, 1)
+    ghost  = Ghost(12, 14)
 end
 
 function love.update(dt)
     pacman:update(dt)
     entity:update(dt)
+    ghost:update(dt)
 end
 
 function love.draw()
     labyrinth:draw()
     --pacman:draw()
     entity:draw()
+    ghost:draw()
 end
 
 -- Room --

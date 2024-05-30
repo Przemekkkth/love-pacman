@@ -11,6 +11,7 @@ function Entity:new(tileX, tileY)
     self.m_pickUpSFX = love.audio.newSource('assets/sfx/pacman_chomp.wav', 'static')
     self.m_pickUpSFX:setVolume(0.5)
     self.m_grid = anim8.newGrid( THINGS_IMG_SIZE, THINGS_IMG_SIZE, THINGS_IMG:getWidth(), THINGS_IMG:getHeight() )
+    self.m_alive = true
 
     self.animations = {}
     self.animations.down = anim8.newAnimation( self.m_grid('4-6', 1), 0.2 )
@@ -218,4 +219,8 @@ function Entity:updateAnim(dt)
     end
 
     self.m_anim:update(dt)
+end
+
+function Entity:isAlive()
+    return self.m_alive
 end
