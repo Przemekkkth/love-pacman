@@ -32,19 +32,23 @@ function love.load()
     requireFiles(object_files)
 
     labyrinth = Labyrinth()
-    pacman = Pacman(1, 4)
+    pacman = Pacman(13, 23)
     clyde  = Clyde(12, 14)
+    blinky = Blinky(13, 14)
 end
 
 function love.update(dt)
+    timer:update(dt)
     pacman:update(dt)
     clyde:update(dt)
+    blinky:update(dt)
 end
 
 function love.draw()
     labyrinth:draw()
     pacman:draw()
     clyde:draw()
+    blinky:draw()
 end
 
 -- Room --

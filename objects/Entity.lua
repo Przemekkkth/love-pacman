@@ -16,7 +16,7 @@ function Entity:posX()
     return self.screenPosX
 end
 
-function Entity:posX() 
+function Entity:posY() 
     return self.screenPosY
 end
 
@@ -70,6 +70,10 @@ function Entity:round(num)
     else
         return math.ceil(num - 0.5)
     end
+end
+
+function Entity:setAlive(val)
+    self.alive = val
 end
 
 function Entity:isAlive()

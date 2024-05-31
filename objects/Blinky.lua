@@ -1,25 +1,34 @@
-Clyde = Ghost:extend()
+Blinky = Ghost:extend()
 
-function Clyde:new(tileX, tileY)
-    Clyde.super.new(self, tileX, tileY)
+function Blinky:new(tileX, tileY)
+    Blinky.super.new(self, tileX, tileY)
 
     self.animations = {}
-    self.animations.down = anim8.newAnimation( self.grid('3-4', 2), 0.2 )
-    self.animations.left = anim8.newAnimation( self.grid('5-6', 2), 0.2 )
-    self.animations.right = anim8.newAnimation( self.grid('7-8', 2), 0.2 )
-    self.animations.up = anim8.newAnimation( self.grid('1-2', 2), 0.2 )
+    self.animations.down = anim8.newAnimation( self.grid('3-4', 3), 0.2 )
+    self.animations.left = anim8.newAnimation( self.grid('5-6', 3), 0.2 )
+    self.animations.right = anim8.newAnimation( self.grid('7-8', 3), 0.2 )
+    self.animations.up = anim8.newAnimation( self.grid('1-2', 3), 0.2 )
 
     self.anim = self.animations.up
 
     timer:after(1, function()
         self:setOutOfCage(true)
-        self:setTile(12, 11)  
+        self:setTile(15, 11)  
        end)
 end
 
-function Clyde:update(dt)
+function Blinky:update(dt)
     if not self:isFrightened() then
-        self:setDestinationTile(pacman:getTileX(), pacman:getTileY())
+        if pacman:getDirection() == 'up' then
+            self:setDestinationTile(pacman:getTileX(), pacman:getTileY() - 4)
+        elseif pacman:getDirection() == 'down' then
+            self:setDestinationTile(pacman:getTileX(), pacman:getTileY() + 4)
+        elseif pacman:getDirection() == 'left' then
+            self:setDestinationTile(pacman:getTileX() - 4, pacman:getTileY())
+        elseif pacman:getDirection() == 'right' then
+            self:setDestinationTile(pacman:getTileX() + 4, pacman:getTileY())
+        end
+        
     else
         self:setDestinationTile(1, 1) -- avoid pacman
     end
@@ -28,11 +37,11 @@ function Clyde:update(dt)
     self:updateAnim(dt)
 end
 
-function Clyde:draw()
+function Blinky:draw()
     self.anim:draw(THINGS_IMG, self.screenPosX - self.offset, self.screenPosY - self.offset)
 end
 
-function Clyde:updateAnim(dt)
+function Blinky:updateAnim(dt)
     if not self:isFrightened() then
         if self:getDirection() == 'none' then
             self.anim:gotoFrame(1)
@@ -52,7 +61,7 @@ function Clyde:updateAnim(dt)
     self.anim:update(dt)
 end
 
-function Clyde:calculateDistance(addX, addY)
+function Blinky:calculateDistance(addX, addY)
     local distance = 1000000.0
     local tempX = self.tileX + 1
     local tempY = self.tileY - 2
@@ -64,7 +73,7 @@ function Clyde:calculateDistance(addX, addY)
     return distance
 end
 
-function Clyde:canMove()
+function Blinky:canMove()
     local tempX = self.tileX + 1
     local tempY = self.tileY - 2
     
@@ -80,7 +89,7 @@ function Clyde:canMove()
     return false
 end
 
-function Clyde:handleMovement() 
+function Blinky:handleMovement() 
     if not self:isOutOfCage() then
         return
     end
@@ -131,11 +140,11 @@ function Clyde:handleMovement()
     end
 end
 
-function Clyde:moveToCage()
+function Blinky:moveToCage()
     self:setOutOfCage(false)
-    self:setTile(12, 14)
+    self:setTile(13, 14)
     timer:after(4, function()
         self:setOutOfCage(true)
-        self:setTile(12, 11)  
+        self:setTile(15, 11) 
        end)
 end

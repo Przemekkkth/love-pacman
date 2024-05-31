@@ -1,15 +1,16 @@
 Ghost = Entity:extend()
 
 function Ghost:new(tileX, tileY)
-    Pacman.super.new(self, tileX, tileY)
+    Ghost.super.new(self, tileX, tileY)
 
     self.destinationTileX = self.tileX
     self.destinationTileY = self.tileY
     self.scattering = false
     self.outOfCage = false
     self.decision = false
-    self.frightened = 1.0 -- time
-
+    self.frightened = false
+    self.frightenedTime = 3
+    self.frightenedAnim = anim8.newAnimation( self.grid('9-10', 2), 0.2 )
 end
 
 function Ghost:setDestinationTile(x, y)
@@ -38,7 +39,7 @@ function Ghost:setOutOfCage(val)
 end
 
 function Ghost:isOutOfCage() 
-    return self.isOutOfCage
+    return self.outOfCage
 end
 
 function Ghost:setTakeDecision(val)
@@ -47,4 +48,25 @@ end
 
 function Ghost:shouldTakeDecision()
     return self.decision
+end
+
+function Ghost:isFrightened()
+    return self.frightened
+end
+
+function Ghost:setFrightened(val)
+    self.frightened = val
+end
+
+function Ghost:setFrightenedMode()
+    if self.outOfCage then
+        self.frightened = true
+        timer:after(self.frightenedTime, function()
+            self.frightened = false
+           end)
+    end
+end
+
+function Ghost:getFrightenedAnim()
+    return self.frightenedAnim
 end
