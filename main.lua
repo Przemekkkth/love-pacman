@@ -23,27 +23,28 @@ function love.load()
     love.window.setTitle(Settings.title)
     love.window.setMode(Settings.screenWidth, Settings.screenHeight)
 
+
+    --there are base components so its are required first
+    require 'objects/Entity'
+    require 'objects/Ghost'
     local object_files = {}
     recursiveEnumerate('objects', object_files)
     requireFiles(object_files)
 
     labyrinth = Labyrinth()
-    pacman = Pacman()
-    entity = Entity(1, 1)
-    ghost  = Ghost(12, 14)
+    pacman = Pacman(1, 4)
+    clyde  = Clyde(12, 14)
 end
 
 function love.update(dt)
     pacman:update(dt)
-    entity:update(dt)
-    ghost:update(dt)
+    clyde:update(dt)
 end
 
 function love.draw()
     labyrinth:draw()
-    --pacman:draw()
-    entity:draw()
-    ghost:draw()
+    pacman:draw()
+    clyde:draw()
 end
 
 -- Room --

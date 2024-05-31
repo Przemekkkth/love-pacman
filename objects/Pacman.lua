@@ -1,84 +1,148 @@
-Pacman = Object:extend()
+Pacman = Entity:extend()
 
-function Pacman:new()
-    self.m_posX  = 1
-    self.m_posY  = 1
-    self.m_speed = 0.1
-    self.m_size = 30
-    self.m_direction = "none"
-    
-    
-    -- m_screenPosX = tilePosX * Resources::LABYRINTH_TILE_SIZE + 8.0f + 8.0f - Resources::THINGS_TILE_SIZE/2;
-    -- m_screenPosY = tilePosY * Resources::LABYRINTH_TILE_SIZE + 8.0f - Resources::THINGS_TILE_SIZE/2;
-    self.m_grid = anim8.newGrid( self.m_size, self.m_size, THINGS_IMG:getWidth(), THINGS_IMG:getHeight() )
+function Pacman:new(tileX, tileY)
+    Pacman.super.new(self, tileX, tileY)
 
+    self.speed = 2.0
+    self.nextMove = nil
+    self.pickUpSFX = love.audio.newSource('assets/sfx/pacman_chomp.wav', 'static')
+    self.pickUpSFX:setVolume(0.5)
     self.animations = {}
-    self.animations.down = anim8.newAnimation( self.m_grid('4-6', 1), 0.2 )
-    self.animations.left = anim8.newAnimation( self.m_grid('7-9', 1), 0.2 )
-    self.animations.right = anim8.newAnimation( self.m_grid('10-12', 1), 0.2 )
-    self.animations.up = anim8.newAnimation( self.m_grid('1-3', 1), 0.2 )
-
-    self.m_anim = self.animations.down
+    self.animations.down  = anim8.newAnimation( self.grid('4-6', 1), 0.2 )
+    self.animations.left  = anim8.newAnimation( self.grid('7-9', 1), 0.2 )
+    self.animations.right = anim8.newAnimation( self.grid('10-12', 1), 0.2 )
+    self.animations.up    = anim8.newAnimation( self.grid('1-3', 1), 0.2 )
+    self.anim = self.animations.down
 end
 
 function Pacman:update(dt)
-    local vx = 0
-    local vy = 0
-    if input:down('left_arrow') then
-        self.m_direction = "left"
-        self.m_anim = self.animations.left
-    elseif input:down('right_arrow') then 
-        vx = self.m_speed
-        self.m_anim = self.animations.right
-        self.m_direction = "right"
-    elseif input:down('up_arrow') then 
-        vy = self.m_speed * -1
-        self.m_direction = "up"
-        self.m_anim = self.animations.up
-    elseif input:down('down_arrow') then 
-        vy = self.m_speed 
-        self.m_direction = "down"
-        self.m_anim = self.animations.down
-    end
-    if input:released('p') then
+    self:handleMovement()
+    local tempX = self.tileX + 1
+    local tempY = self.tileY - 2
+    if labyrinth:isCollidedWithCoin(tempY, tempX, true) then
+        self.pickUpSFX:play()
+    elseif labyrinth:isCollidedWithEnergizer(tempY, tempX, true) then
+        self.pickUpSFX:play()
     end
 
-    if self.m_direction == "left" then
-        vx = self.m_speed * -1
-    elseif self.m_direction == "right" then 
-        vx = self.m_speed
-    elseif self.m_direction == "up" then 
-        vy = self.m_speed * -1
-    elseif self.m_direction == "down" then 
-        vy = self.m_speed
-    end
-
-    if self:checkCollisionWithStaticBlock() == false then
-        self.m_posX = self.m_posX + vx 
-        self.m_posY = self.m_posY + vy 
-        
-    end
-
-
-    if input:released('p') then 
-        print("x ", self.m_posX, ' ',self.m_posY)
-    end
-
-    self.m_anim:update(dt)
-end
-
-function Pacman:checkCollisionWithStaticBlock()
-
+    self:checkTeleport()
+    self:updateAnim(dt)
 end
 
 function Pacman:draw()
-    self.m_anim:draw(THINGS_IMG, self:convertTilesToScreenPos()[1], self:convertTilesToScreenPos()[2])
+    self.anim:draw(THINGS_IMG, self.screenPosX - self.offset, self.screenPosY - self.offset)
 end
 
-function Pacman:convertTilesToScreenPos()
-    return {(labyrinth.OFFSET_X + (self.m_posX  * 16) - self.m_size / 4), labyrinth.OFFSET_Y + (self.m_posY  * 16) - self.m_size / 4}
+function Pacman:updateAnim(dt)
+    if self:getDirection() == "none" then
+        self.anim:gotoFrame(1)
+    elseif self:getDirection() == "left" then
+        self.anim = self.animations.left
+    elseif self:getDirection() == "right" then
+        self.anim = self.animations.right
+    elseif self:getDirection() == "up" then
+        self.anim = self.animations.up
+    elseif self:getDirection() == "down" then
+        self.anim = self.animations.down
+    end
+
+    self.anim:update(dt)
 end
 
-function Pacman:convertScreenPosToTiles()
-    return {math.floor(self.m_posX + 1), math.floor(self.m_posY + 1) }
+function Pacman:handleMovement()
+    if self:getDirection() == 'none' then
+        self.nextMove = nil
+        if input:down('left_arrow') then
+            self:setDirection('left')
+        elseif input:down('right_arrow') then
+            self:setDirection('right')
+        elseif input:down('up_arrow') then 
+            self:setDirection('up')
+        elseif input:down('down_arrow') then 
+            self:setDirection('down')
+        end
+    elseif self:getDirection() == 'left' then
+        if input:down('right_arrow') then
+            self:setDirection('right')
+        elseif input:down('up_arrow') and self:isPosXAlignedToGrid() then
+            self.nextMove = 'up'
+        elseif input:down('down_arrow') and self:isPosXAlignedToGrid() then
+            self.nextMove = 'down'
+        end
+    elseif self:getDirection() == 'right' then
+        if input:down('left_arrow') then
+            self:setDirection('left')
+        elseif input:down('up_arrow') and self:isPosXAlignedToGrid() then
+            self.nextMove = 'up'
+        elseif input:down('down_arrow') and self:isPosXAlignedToGrid() then
+            self.nextMove = 'down'
+        end
+    elseif self:getDirection() == 'up' then
+        if input:down('down_arrow') then
+            self.direction = 'down'
+            self:setDirection('down')
+        elseif input:down('left_arrow') and self:isPosYAlignedToGrid() then
+            self.nextMove = 'left'
+        elseif input:down('right_arrow') and self:isPosYAlignedToGrid() then
+            self.nextMove = 'right'
+        end 
+    elseif self:getDirection() == 'down' then
+        if input:down('up_arrow') then
+            self:setDirection('up')
+        elseif input:down('left_arrow') and self:isPosYAlignedToGrid() then
+            self.nextMove = 'left'
+        elseif input:down('right_arrow') and self:isPosYAlignedToGrid() then
+            self.nextMove = 'right'
+        end   
+    end
+
+    --convert to Lua coord (0, 0) => (1, 1)
+    self:calculateTiles()
+    local tempX = self.tileX + 1
+    local tempY = self.tileY - 2
+    if self:getDirection() == 'left' then
+        if not labyrinth:isBlockedElement(tempY, tempX - 1) then
+            if labyrinth:checkMovePoint(tempX, tempY, self.nextMove) then
+                self:setDirection(self.nextMove)
+                self.nextMove = nil
+            else
+                self:move(-self.speed, 0)
+            end
+        else
+            self:setDirection('none')
+        end
+    elseif self:getDirection() == 'right' then
+        if not labyrinth:isBlockedElement(tempY, tempX + 1) then
+            if labyrinth:checkMovePoint(tempX, tempY, self.nextMove) then
+                self:setDirection(self.nextMove)
+                self.nextMove = nil
+            else
+                self:move(self.speed, 0)
+            end
+        else
+            self:setDirection('none')
+        end
+    elseif self:getDirection() == 'up' then   
+        if not labyrinth:isBlockedElement(tempY - 1, tempX) then
+            if labyrinth:checkMovePoint(tempX, tempY, self.nextMove) then
+                self:setDirection(self.nextMove)
+                self.nextMove = nil
+            else
+                self:move(0, -self.speed)
+            end
+        else
+            self:setDirection('none')
+        end
+    elseif self:getDirection() == 'down' then 
+        if not labyrinth:isBlockedElement(tempY + 1, tempX) then
+            if labyrinth:checkMovePoint(tempX, tempY, self.nextMove) then
+                self:setDirection(self.nextMove)
+                self.nextMove = nil
+            else
+                self:move(0, self.speed)
+            end
+        else
+            self:setDirection('none')
+        end
+    end
 end
