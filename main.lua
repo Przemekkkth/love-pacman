@@ -9,6 +9,7 @@ require 'utils/Utils'
 
 THINGS_IMG = love.graphics.newImage('assets/sprite/things.png')
 THINGS_IMG_SIZE = 30
+FONT = love.graphics.newFont('assets/font/arcadepi.ttf', 32)
 function love.load()
     input = Input()
     timer = Timer()
@@ -41,6 +42,7 @@ end
 
 function love.update(dt)
     timer:update(dt)
+    labyrinth:update(dt)
     pacman:update(dt)
     clyde:update(dt)
     blinky:update(dt)
@@ -90,7 +92,8 @@ function love.keypressed(key, scancode, isrepeat)
     end
  end
 
-function love.run()
+
+ function love.run()
     if love.math then love.math.setRandomSeed(os.time()) end
     if love.load then love.load(arg) end
     if love.timer then love.timer.step() end

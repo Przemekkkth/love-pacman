@@ -21,7 +21,7 @@ function Inky:update(dt)
     if not self:isFrightened() then
         self:setDestinationTile(pacman:getTileX() + (blinky:getTileX() - pacman:getTileX()), pacman:getTileY() + (blinky:getTileY() - pacman:getTileY())  )
     else
-        self:setDestinationTile(1, 1) -- avoid pacman
+        self:setDestinationTile(2, 30) 
     end
     self:handleMovement()
     self:checkTeleport()

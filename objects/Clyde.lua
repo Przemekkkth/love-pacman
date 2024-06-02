@@ -21,7 +21,7 @@ function Clyde:update(dt)
     if not self:isFrightened() then
         self:setDestinationTile(pacman:getTileX(), pacman:getTileY())
     else
-        self:setDestinationTile(1, 1) -- avoid pacman
+        self:setDestinationTile(27, 2) -- avoid pacman
     end
     self:handleMovement()
     self:checkTeleport()

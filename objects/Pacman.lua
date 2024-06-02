@@ -28,8 +28,10 @@ function Pacman:update(dt)
         local tempY = self.tileY - 2
         if labyrinth:isCollidedWithCoin(tempY, tempX, true) then
             self.pickUpSFX:play()
+            labyrinth:addScore(5)
         elseif labyrinth:isCollidedWithEnergizer(tempY, tempX, true) then
             self.pickUpSFX:play()
+            labyrinth:addScore(10)
             blinky:setFrightenedMode()
             clyde:setFrightenedMode()
             inky:setFrightenedMode()
@@ -174,6 +176,7 @@ function Pacman:checkCollisionWithClyde()
        self:posY() + size > clyde:posY() and self:isAlive() then
         if not clyde:isFrightened() then
             self:dead()
+            labyrinth:decreaseLifes()
             clyde:moveToCage()
             blinky:moveToCage()
             inky:moveToCage()
@@ -193,9 +196,11 @@ function Pacman:checkCollisionWithBlinky()
        self:posY() + size > blinky:posY() and self:isAlive() then
         if not blinky:isFrightened() then
             self:dead()
+            labyrinth:decreaseLifes()
             blinky:moveToCage()
             clyde:moveToCage()
             inky:moveToCage()
+            pinky:moveToCage()
         else
             self.eatGhostSFX:play()
             blinky:moveToCage()
@@ -211,6 +216,7 @@ function Pacman:checkCollisionWithInky()
        self:posY() + size > inky:posY() and self:isAlive() then
         if not inky:isFrightened() then
             self:dead()
+            labyrinth:decreaseLifes()
             blinky:moveToCage()
             clyde:moveToCage()
             inky:moveToCage()
@@ -230,6 +236,7 @@ function Pacman:checkCollisionWithPinky()
        self:posY() + size > pinky:posY() and self:isAlive() then
         if not pinky:isFrightened() then
             self:dead()
+            labyrinth:decreaseLifes()
             blinky:moveToCage()
             clyde:moveToCage()
             inky:moveToCage()

@@ -22,7 +22,7 @@ function Pinky:update(dt)
         if math.sqrt( math.pow(self:getTileX() - pacman:getTileX(), 2) + math.pow(self:getTileY() - pacman:getTileY(), 2) ) < 9 then
             self:setDestinationTile(pacman:getTileX(), pacman:getTileY())
         else
-            self:setDestinationTile(1, 32)
+            self:setDestinationTile(27, 30)
         end
     else
         self:setDestinationTile(1, 1) -- avoid pacman

@@ -123,17 +123,33 @@ function Labyrinth:new()
     self.OFFSET_Y = 3 * self.tileSize
     self.debugMode = false
     self.score = 0
+    self.prizes = {'strawberry', 'cherry', 'key', 'bell'}
+    self.prize = nil
+    self.prizeTable = {}
+    self.showPrize = true
+    self.lifeImg = love.graphics.newQuad(300, 0, 30, 30, THINGS_IMG)
+    self.strawberryImg = love.graphics.newQuad(240, 60, 30, 30, THINGS_IMG)
+    self.cherryImg = love.graphics.newQuad(240, 90, 30, 30, THINGS_IMG)
+    self.bellImg = love.graphics.newQuad(240, 120, 30, 30, THINGS_IMG)
+    self.keyImg = love.graphics.newQuad(270, 60, 30, 30, THINGS_IMG)
+    self.prizeName = nil
+    self.prizeSFX = love.audio.newSource('assets/sfx/pacman_eatfruit.wav', 'static')
+    self.prizeSFX:setVolume(0.5)
+    self.lifes = 5
 end
 
 function Labyrinth:update(dt)
-
+    self:collidePacmanWithPrize()
 end
 
 function Labyrinth:draw()
     self.gameMap:draw()
     self:drawCoins()
     self:drawEnergizer()
-
+    self:drawScore()
+    self:drawPrize()
+    self:drawTrophies()
+    self:drawLifes()
     if self.debugMode then
         love.graphics.setColor(0,1,0)
         for x = 1, Settings.screenWidth / self.tileSize do
@@ -254,6 +270,92 @@ function Labyrinth:drawEnergizer()
     end
 end
 
+function Labyrinth:drawScore()
+    love.graphics.setFont(FONT)
+    love.graphics.print("Score: "..self.score, 0, 0)
+end
+
 function Labyrinth:addScore(val)
-    
+    self.score = self.score + val
+    if self.score % 105 == 0 and self.score < 106 then
+        self:generatePrize()
+    elseif self.score % 205 == 0 and self.score < 206 then
+        self:generatePrize()
+    elseif self.score % 305 == 0 and self.score < 306 then
+        self:generatePrize()
+    elseif self.score % 405 == 0 and self.score < 406 then
+        self:generatePrize()
+    elseif self.score % 505 == 0 and self.score < 506 then
+        self:generatePrize()
+    end
+end
+
+function Labyrinth:generatePrize()
+    local idx = math.random(1, 4)
+    self.showPrize = true
+    if idx == 1 then
+        self.prize = self.strawberryImg
+        self.prizeName = 'strawberry'
+    elseif idx == 2 then
+        self.prize = self.cherryImg
+        self.prizeName = 'cherry'
+    elseif idx == 3 then
+        self.prize = self.bellImg
+        self.prizeName = 'bell'
+    elseif idx == 4 then
+        self.prize = self.keyImg
+        self.prizeName = 'key'
+    end
+end
+
+function Labyrinth:drawPrize()
+    if self.showPrize then
+        if self.prize then
+            love.graphics.draw(THINGS_IMG, self.prize, 13.5 * self.tileSize - 7, 20 * self.tileSize - 7)
+        end
+    end
+end
+
+function Labyrinth:drawTrophies()
+    for i = 1, #self.prizeTable do
+       love.graphics.draw(THINGS_IMG, self.prizeTable[i], Settings.screenWidth - (i * 30), Settings.screenHeight - 30)
+    end
+end
+
+function Labyrinth:drawLifes()
+    for i = 0, self.lifes do
+        love.graphics.draw(THINGS_IMG, self.lifeImg, (i * 30), Settings.screenHeight - 30)
+    end
+end
+
+function Labyrinth:decreaseLifes()
+    self.lifes = self.lifes - 1
+end
+
+function Labyrinth:collidePacmanWithPrize()
+    local size = THINGS_IMG_SIZE
+    local prizeX = 13.5 * self.tileSize - 7
+    local prizeY = 20 * self.tileSize - 7
+
+    if pacman:posX() < prizeX + size and
+    pacman:posX() + size         > prizeX and
+    pacman:posY() < prizeY + size and
+    pacman:posY() + size > prizeY and pacman:isAlive() and self.showPrize then
+        if self.prizeName == 'strawberry' then
+            table.insert(self.prizeTable, self.strawberryImg)
+            self.prizeSFX:play()
+        elseif self.prizeName == 'cherry' then
+            table.insert(self.prizeTable, self.cherryImg)
+            self.prizeSFX:play()
+        elseif self.prizeName == 'bell' then
+            table.insert(self.prizeTable, self.bellImg)
+            self.prizeSFX:play()
+        elseif self.prizeName == 'key' then
+            table.insert(self.prizeTable, self.keyImg)
+            self.prizeSFX:play()
+        end
+        
+        self.showPrize = false
+        self.prize = nil
+    end
 end

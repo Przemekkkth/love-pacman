@@ -30,7 +30,7 @@ function Blinky:update(dt)
         end
         
     else
-        self:setDestinationTile(1, 1) -- avoid pacman
+        self:setDestinationTile(2, 2) -- avoid pacman
     end
     self:handleMovement()
     self:checkTeleport()
