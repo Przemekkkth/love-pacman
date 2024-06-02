@@ -1,16 +1,15 @@
-Object = require 'libraries/classic'
-sti = require 'libraries/sti'
-anim8 = require 'libraries/anim8'
-Input = require 'libraries/boipushy/Input'
-Timer = require 'libraries/hump/timer'
-require 'utils/Settings'
-require 'utils/Utils'
-
-
-THINGS_IMG = love.graphics.newImage('assets/sprite/things.png')
-THINGS_IMG_SIZE = 30
-FONT = love.graphics.newFont('assets/font/arcadepi.ttf', 32)
 function love.load()
+    Object = require 'libraries/classic'
+    sti = require 'libraries/sti'
+    anim8 = require 'libraries/anim8'
+    Input = require 'libraries/boipushy/Input'
+    Timer = require 'libraries/hump/timer'
+    require 'utils/Settings'
+    require 'utils/Utils'
+
+    THINGS_IMG = love.graphics.newImage('assets/sprite/things.png')
+    THINGS_IMG_SIZE = 30
+    FONT = love.graphics.newFont('assets/font/arcadepi.ttf', 32)
     input = Input()
     timer = Timer()
 
@@ -20,10 +19,12 @@ function love.load()
     input:bind('down', 'down_arrow')
     input:bind('mouse1', 'leftButton')
     input:bind('p', 'p')
+    input:bind('backspace', 'backspace')
+    input:bind('n', 'n')
+    input:bind('escape', 'escape')
 
     love.window.setTitle(Settings.title)
     love.window.setMode(Settings.screenWidth, Settings.screenHeight)
-
 
     --there are base components so its are required first
     require 'objects/Entity'
@@ -32,31 +33,28 @@ function love.load()
     recursiveEnumerate('objects', object_files)
     requireFiles(object_files)
 
-    labyrinth = Labyrinth()
-    pacman = Pacman(13, 23)
-    clyde  = Clyde(12, 14)
-    blinky = Blinky(13, 14)
-    inky   = Inky(14, 14)
-    pinky  = Pinky(15, 14)
+    local object_files = {}
+    recursiveEnumerate('rooms', object_files)
+    requireFiles(object_files)
+
+    current_room = nil
+    gotoRoom('Menu')
 end
 
 function love.update(dt)
-    timer:update(dt)
-    labyrinth:update(dt)
-    pacman:update(dt)
-    clyde:update(dt)
-    blinky:update(dt)
-    inky:update(dt)
-    pinky:update(dt)
+    if current_room then current_room:update(dt) end
+
+    if input:released('escape') then 
+        love.event.quit()
+    elseif input:released('backspace') then
+        gotoRoom('Menu')
+    elseif input:released('n') then
+        gotoRoom('GameScene')
+    end
 end
 
 function love.draw()
-    labyrinth:draw()
-    pacman:draw()
-    clyde:draw()
-    blinky:draw()
-    inky:draw()
-    pinky:draw()
+    if current_room then current_room:draw() end
 end
 
 -- Room --
@@ -86,14 +84,7 @@ function requireFiles(files)
     end
 end
 
-function love.keypressed(key, scancode, isrepeat)
-    if key == "escape" then
-       love.event.quit()
-    end
- end
-
-
- function love.run()
+function love.run()
     if love.math then love.math.setRandomSeed(os.time()) end
     if love.load then love.load(arg) end
     if love.timer then love.timer.step() end

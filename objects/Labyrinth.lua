@@ -136,6 +136,7 @@ function Labyrinth:new()
     self.prizeSFX = love.audio.newSource('assets/sfx/pacman_eatfruit.wav', 'static')
     self.prizeSFX:setVolume(0.5)
     self.lifes = 5
+    love.graphics.setFont(FONT)
 end
 
 function Labyrinth:update(dt)
@@ -271,7 +272,6 @@ function Labyrinth:drawEnergizer()
 end
 
 function Labyrinth:drawScore()
-    love.graphics.setFont(FONT)
     love.graphics.print("Score: "..self.score, 0, 0)
 end
 
