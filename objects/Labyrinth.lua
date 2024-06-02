@@ -122,6 +122,7 @@ function Labyrinth:new()
     self.OFFSET_X = 0
     self.OFFSET_Y = 3 * self.tileSize
     self.debugMode = false
+    self.score = 0
 end
 
 function Labyrinth:update(dt)
@@ -251,4 +252,8 @@ function Labyrinth:drawEnergizer()
             end
         end
     end
+end
+
+function Labyrinth:addScore(val)
+    
 end

@@ -1,34 +1,25 @@
-Blinky = Ghost:extend()
+Inky = Ghost:extend()
 
-function Blinky:new(tileX, tileY)
-    Blinky.super.new(self, tileX, tileY)
-
+function Inky:new(tileX, tileY)
+    Inky.super.new(self, tileX, tileY)
+    self.speed = 1
     self.animations = {}
-    self.animations.down = anim8.newAnimation( self.grid('3-4', 5), 0.2 )
-    self.animations.left = anim8.newAnimation( self.grid('5-6', 5), 0.2 )
-    self.animations.right = anim8.newAnimation( self.grid('7-8', 5), 0.2 )
-    self.animations.up = anim8.newAnimation( self.grid('1-2', 5), 0.2 )
+    self.animations.down = anim8.newAnimation( self.grid('3-4', 4), 0.2 )
+    self.animations.left = anim8.newAnimation( self.grid('5-6', 4), 0.2 )
+    self.animations.right = anim8.newAnimation( self.grid('7-8', 4), 0.2 )
+    self.animations.up = anim8.newAnimation( self.grid('1-2', 4), 0.2 )
 
     self.anim = self.animations.up
 
-    timer:after(1, function()
+    timer:after(1.5, function()
         self:setOutOfCage(true)
         self:setTile(15, 11)  
        end)
 end
 
-function Blinky:update(dt)
+function Inky:update(dt)
     if not self:isFrightened() then
-        if pacman:getDirection() == 'up' then
-            self:setDestinationTile(pacman:getTileX(), pacman:getTileY() - 4)
-        elseif pacman:getDirection() == 'down' then
-            self:setDestinationTile(pacman:getTileX(), pacman:getTileY() + 4)
-        elseif pacman:getDirection() == 'left' then
-            self:setDestinationTile(pacman:getTileX() - 4, pacman:getTileY())
-        elseif pacman:getDirection() == 'right' then
-            self:setDestinationTile(pacman:getTileX() + 4, pacman:getTileY())
-        end
-        
+        self:setDestinationTile(pacman:getTileX() + (blinky:getTileX() - pacman:getTileX()), pacman:getTileY() + (blinky:getTileY() - pacman:getTileY())  )
     else
         self:setDestinationTile(1, 1) -- avoid pacman
     end
@@ -37,11 +28,11 @@ function Blinky:update(dt)
     self:updateAnim(dt)
 end
 
-function Blinky:draw()
+function Inky:draw()
     self.anim:draw(THINGS_IMG, self.screenPosX - self.offset, self.screenPosY - self.offset)
 end
 
-function Blinky:updateAnim(dt)
+function Inky:updateAnim(dt)
     if not self:isFrightened() then
         if self:getDirection() == 'none' then
             self.anim:gotoFrame(1)
@@ -61,7 +52,7 @@ function Blinky:updateAnim(dt)
     self.anim:update(dt)
 end
 
-function Blinky:calculateDistance(addX, addY)
+function Inky:calculateDistance(addX, addY)
     local distance = 1000000.0
     local tempX = self.tileX + 1
     local tempY = self.tileY - 2
@@ -73,7 +64,7 @@ function Blinky:calculateDistance(addX, addY)
     return distance
 end
 
-function Blinky:canMove()
+function Inky:canMove()
     local tempX = self.tileX + 1
     local tempY = self.tileY - 2
     
@@ -89,7 +80,7 @@ function Blinky:canMove()
     return false
 end
 
-function Blinky:handleMovement() 
+function Inky:handleMovement() 
     if not self:isOutOfCage() then
         return
     end
@@ -140,10 +131,10 @@ function Blinky:handleMovement()
     end
 end
 
-function Blinky:moveToCage()
+function Inky:moveToCage()
     self:setOutOfCage(false)
-    self:setTile(13, 14)
-    timer:after(4, function()
+    self:setTile(14, 14)
+    timer:after(4.5, function()
         self:setOutOfCage(true)
         self:setTile(15, 11) 
        end)

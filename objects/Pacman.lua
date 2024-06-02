@@ -3,7 +3,7 @@ Pacman = Entity:extend()
 function Pacman:new(tileX, tileY)
     Pacman.super.new(self, tileX, tileY)
 
-    self.speed = 2.0
+    self.speed = 2
     self.nextMove = nil
     self.pickUpSFX = love.audio.newSource('assets/sfx/pacman_chomp.wav', 'static')
     self.pickUpSFX:setVolume(0.5)
@@ -32,11 +32,15 @@ function Pacman:update(dt)
             self.pickUpSFX:play()
             blinky:setFrightenedMode()
             clyde:setFrightenedMode()
+            inky:setFrightenedMode()
+            pinky:setFrightenedMode()
         end
 
         self:checkTeleport()
         self:checkCollisionWithClyde()
         self:checkCollisionWithBlinky()
+        self:checkCollisionWithInky()
+        self:checkCollisionWithPinky()
     end
     self:updateAnim(dt)
 end
@@ -171,9 +175,11 @@ function Pacman:checkCollisionWithClyde()
         if not clyde:isFrightened() then
             self:dead()
             clyde:moveToCage()
+            blinky:moveToCage()
+            inky:moveToCage()
+            pinky:moveToCage()
         else
             self.eatGhostSFX:play()
-            blinky:moveToCage()
             clyde:moveToCage()
         end
     end
@@ -185,13 +191,52 @@ function Pacman:checkCollisionWithBlinky()
        self:posX() + size         > blinky:posX() and
        self:posY() < blinky:posY() + size and
        self:posY() + size > blinky:posY() and self:isAlive() then
-        if not clyde:isFrightened() then
+        if not blinky:isFrightened() then
             self:dead()
             blinky:moveToCage()
             clyde:moveToCage()
+            inky:moveToCage()
         else
             self.eatGhostSFX:play()
             blinky:moveToCage()
+        end
+    end
+end
+
+function Pacman:checkCollisionWithInky()
+    local size = THINGS_IMG_SIZE - 14 --both the same
+    if self:posX() < inky:posX() + size and
+       self:posX() + size         > inky:posX() and
+       self:posY() < inky:posY() + size and
+       self:posY() + size > inky:posY() and self:isAlive() then
+        if not inky:isFrightened() then
+            self:dead()
+            blinky:moveToCage()
+            clyde:moveToCage()
+            inky:moveToCage()
+            pinky:moveToCage()
+        else
+            self.eatGhostSFX:play()
+            inky:moveToCage()
+        end
+    end
+end
+
+function Pacman:checkCollisionWithPinky()
+    local size = THINGS_IMG_SIZE - 14 --both the same
+    if self:posX() < pinky:posX() + size and
+       self:posX() + size         > pinky:posX() and
+       self:posY() < pinky:posY() + size and
+       self:posY() + size > pinky:posY() and self:isAlive() then
+        if not pinky:isFrightened() then
+            self:dead()
+            blinky:moveToCage()
+            clyde:moveToCage()
+            inky:moveToCage()
+            pinky:moveToCage()
+        else
+            self.eatGhostSFX:play()
+            pinky:moveToCage()
         end
     end
 end
