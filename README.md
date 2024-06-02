@@ -1,4 +1,4 @@
-#LÖVE PacMan
+# LÖVE PacMan
 Pac-Man, originally called Puck Man in Japan, is a 1980 maze action video game developed and released by Namco for arcades. Game from repo is created in Love2D.
 
 ## Screenshots
